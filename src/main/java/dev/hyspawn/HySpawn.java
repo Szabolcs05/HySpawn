@@ -11,6 +11,7 @@ import dev.hyspawn.listener.VoidFallListener;
 import dev.hyspawn.manager.SpawnDataManager;
 import dev.hyspawn.manager.TeleportManager;
 import dev.hyspawn.util.MessageUtil;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -32,7 +33,13 @@ public final class HySpawn extends JavaPlugin {
 
         registerCommands();
         registerListeners();
+        initMetrics();
         printEnableBanner();
+    }
+
+    private void initMetrics() {
+        // Replace 00000 with your bStats plugin ID from https://bstats.org
+        new Metrics(this, 30946);
     }
 
     @Override

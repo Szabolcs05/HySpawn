@@ -33,12 +33,14 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
     implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
 tasks.shadowJar {
     archiveClassifier.set("")
     archiveFileName.set("HySpawn-b${nextBuild}.jar")
     relocate("com.github.Anon8281.universalScheduler", "dev.hyspawn.universalScheduler")
+    relocate("org.bstats", "dev.hyspawn.bstats")
 }
 
 tasks.build {
