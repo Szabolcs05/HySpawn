@@ -2,6 +2,7 @@
 .gradle/
 build/
 build-number.txt
+gradle.properties
 
 # IDE
 .idea/
