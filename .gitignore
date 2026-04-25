@@ -15,5 +15,6 @@ Thumbs.db
 
 # Java
 *.class
-*.jar
-*.war
+
+# Built jars (but not the gradle wrapper)
+build/
