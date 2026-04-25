@@ -11,7 +11,7 @@ A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Ca
 - **Sounds** — Configurable sounds for teleport, countdown ticks, and cancellation
 - **MiniMessage** — Full MiniMessage formatting support for all messages
 - **PacketEvents** — Uses PacketEvents for actionbar messages
-- **Folia Support** — Fully compatible with Folia/Canvas via UniversalScheduler
+- **Folia Support** — Fully compatible with Folia/Canvas via [UniversalScheduler](https://github.com/Anon8281/UniversalScheduler)
 
 ## Commands
 
