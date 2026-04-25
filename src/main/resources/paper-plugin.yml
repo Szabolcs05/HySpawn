@@ -1,5 +1,5 @@
 name: HySpawn
-version: '1.0.0'
+version: '1.0.1'
 main: dev.hyspawn.HySpawn
 description: A Folia-compatible spawn management plugin
 api-version: '1.21'

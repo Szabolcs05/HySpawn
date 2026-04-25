@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.hyspawn"
-version = "1.0.0"
+version = "1.0.1"
 
 // --- Auto-incrementing build number ---
 val buildNumberFile = file("build-number.txt")
