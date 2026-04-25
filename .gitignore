@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+build-number.txt
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.kiro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+*.jar
+*.war

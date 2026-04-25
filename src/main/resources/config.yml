@@ -1,0 +1,38 @@
+# HySpawn Configuration
+# All messages support MiniMessage formatting
+# See https://docs.advntr.dev/minimessage/format.html
+
+spawn:
+  # Countdown in seconds before teleporting (0 = instant)
+  countdown: 5
+  # Cancel teleport if the player moves during countdown
+  cancel-on-move: true
+  # Cooldown in seconds between /spawn uses (0 = no cooldown)
+  cooldown: 30
+
+sounds:
+  # Set to "" to disable a sound
+  # Format: sound_key:volume:pitch (use Minecraft sound keys, e.g. entity.enderman.teleport)
+  teleport: "entity.enderman.teleport:1.0:1.0"
+  countdown-tick: "block.note_block.hat:0.5:1.2"
+  countdown-final: "block.note_block.pling:1.0:2.0"
+  cancelled: "entity.villager.no:1.0:1.0"
+
+messages:
+  prefix: "<gray>[<gradient:#ff6b6b:#ffa500>HySpawn</gradient><gray>] "
+  spawn-set: "<green>Global spawn has been set to your location."
+  spawn-unset: "<green>Global spawn has been removed."
+  spawn-not-set: "<red>No global spawn has been set."
+  spawn-teleported: "<green>You have been teleported to spawn."
+  spawn-first-join: "<yellow>Welcome! You have been teleported to spawn."
+  spawn-countdown: "<gold>Teleporting in <yellow>{seconds}</yellow> seconds... Don't move!"
+  spawn-cancelled: "<red>Teleport cancelled! You moved."
+  spawn-already-teleporting: "<red>You are already teleporting!"
+  spawn-cooldown: "<red>You must wait <yellow>{seconds}</yellow> seconds before using /spawn again."
+  void-spawn-set: "<green>Void spawn for world <yellow>{world}</yellow> has been set."
+  void-spawn-unset: "<green>Void spawn for world <yellow>{world}</yellow> has been removed."
+  void-spawn-not-set: "<red>No void spawn is set for world <yellow>{world}</yellow>."
+  no-permission: "<red>You don't have permission to do that."
+  player-only: "<red>This command can only be used by players."
+  countdown-actionbar: "<gold>⏳ Teleporting in <yellow><bold>{seconds}</bold></yellow> <gold>seconds..."
+  reload-success: "<green>Configuration reloaded successfully."
