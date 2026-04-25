@@ -51,3 +51,13 @@ Output jar will be in `build/libs/` with auto-incrementing build numbers (e.g. `
 - **Szabolcs**
 - Discord: `szabolc.s`
 - Website: [yoursit.ee/szabolcs](https://yoursit.ee/szabolcs)
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=Szabolcs05%2FHySpawn&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Szabolcs05/HySpawn&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Szabolcs05/HySpawn&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Szabolcs05/HySpawn&type=date&legend=top-left" />
+ </picture>
+</a>
