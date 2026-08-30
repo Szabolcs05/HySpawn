@@ -97,19 +97,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Informational only: /v2/user needs a user-read scope, which a token
+      # scoped purely to creating versions legitimately lacks. A 401 here is a
+      # hint, not a failure — only the publish below decides the outcome.
       - name: Check Modrinth token
         if: env.MODRINTH_TOKEN != ''
+        continue-on-error: true
         run: |
           CODE=$(curl -sS -o /tmp/modrinth-user.json -w '%{http_code}' \
             -H "Authorization: $MODRINTH_TOKEN" \
             https://api.modrinth.com/v2/user)
           if [ "$CODE" = "200" ]; then
-            echo "Token accepted by Modrinth as user: $(jq -r '.username' /tmp/modrinth-user.json)"
+            echo "Token identifies as Modrinth user: $(jq -r '.username' /tmp/modrinth-user.json)"
           else
-            echo "::error::Modrinth rejected the MODRINTH_TOKEN secret (HTTP $CODE)."
-            echo "Create a new token at https://modrinth.com/settings/pats with the"
-            echo "'Create versions' scope, then update the MODRINTH_TOKEN secret."
-            exit 1
+            echo "::notice::Modrinth /v2/user returned HTTP $CODE. Expected when the token"
+            echo "is scoped only to creating versions; the publish step is the real check."
           fi
 
       - name: Publish to Modrinth
