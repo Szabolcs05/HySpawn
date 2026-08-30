@@ -97,25 +97,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Informational only: /v2/user needs a user-read scope, which a token
-      # scoped purely to creating versions legitimately lacks. A 401 here is a
-      # hint, not a failure — only the publish below decides the outcome.
-      - name: Check Modrinth token
+      # Re-running a release would otherwise upload a second copy of a version
+      # that is already on Modrinth, since nothing there rejects duplicates.
+      - name: Check whether Modrinth already has this version
+        id: modrinth_check
         if: env.MODRINTH_TOKEN != ''
-        continue-on-error: true
         run: |
-          CODE=$(curl -sS -o /tmp/modrinth-user.json -w '%{http_code}' \
-            -H "Authorization: $MODRINTH_TOKEN" \
-            https://api.modrinth.com/v2/user)
-          if [ "$CODE" = "200" ]; then
-            echo "Token identifies as Modrinth user: $(jq -r '.username' /tmp/modrinth-user.json)"
+          VERSION="${{ steps.version.outputs.version }}"
+          EXISTS=$(curl -sS "https://api.modrinth.com/v2/project/${{ env.MODRINTH_PROJECT_ID }}/version" \
+            | jq -r --arg v "$VERSION" '[.[] | select(.version_number == $v)] | length')
+          echo "Modrinth versions matching $VERSION: $EXISTS"
+          if [ "$EXISTS" -gt 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Modrinth already has version $VERSION — skipping the upload so it is not duplicated."
           else
-            echo "::notice::Modrinth /v2/user returned HTTP $CODE. Expected when the token"
-            echo "is scoped only to creating versions; the publish step is the real check."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Publish to Modrinth
-        if: env.MODRINTH_TOKEN != ''
+        if: env.MODRINTH_TOKEN != '' && steps.modrinth_check.outputs.exists != 'true'
         uses: Kir-Antipov/mc-publish@v3.3.1
         with:
           modrinth-id: ${{ env.MODRINTH_PROJECT_ID }}
