@@ -4,10 +4,34 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build and publish (e.g. 1.1.0)'
+        required: true
+
+env:
+  MODRINTH_PROJECT_ID: xKIoze7W
+  # Edit these two lists when support changes — they drive the Modrinth release.
+  LOADERS: |
+    paper
+    folia
+    purpur
+    spigot
+  GAME_VERSIONS: |
+    1.21.11
+    26.1
+    26.1.1
+    26.1.2
+    26.2
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,20 +45,60 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not determine a version to build."
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "jar=build/libs/HySpawn-$VERSION.jar" >> "$GITHUB_OUTPUT"
+          echo "Building HySpawn $VERSION"
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew shadowJar
+        run: ./gradlew shadowJar -PpluginVersion=${{ steps.version.outputs.version }}
 
-      - name: Get jar filename
-        id: jar
-        run: echo "file=$(ls build/libs/HySpawn-*.jar)" >> $GITHUB_OUTPUT
+      - name: Verify jar exists
+        run: ls -lh "${{ steps.version.outputs.jar }}"
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.jar.outputs.file }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: HySpawn ${{ steps.version.outputs.version }}
+          files: ${{ steps.version.outputs.jar }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Modrinth
+        if: env.MODRINTH_TOKEN != ''
+        uses: Kir-Antipov/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ env.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: ${{ steps.version.outputs.jar }}
+          name: HySpawn ${{ steps.version.outputs.version }}
+          version: ${{ steps.version.outputs.version }}
+          version-type: release
+          loaders: ${{ env.LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          dependencies: |
+            packetevents(required)
+          changelog: |
+            Release notes: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}
+
+      - name: Note missing Modrinth token
+        if: env.MODRINTH_TOKEN == ''
+        run: |
+          echo "::warning::MODRINTH_TOKEN secret is not set — skipped publishing to Modrinth."
+          echo "Add it under Settings → Secrets and variables → Actions, then re-run this workflow."

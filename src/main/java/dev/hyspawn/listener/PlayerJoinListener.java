@@ -2,6 +2,7 @@ package dev.hyspawn.listener;
 
 import dev.hyspawn.HySpawn;
 import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,9 +25,19 @@ public final class PlayerJoinListener implements Listener {
     public void onSpawnLocation(AsyncPlayerSpawnLocationEvent event) {
         if (!plugin.getSpawnDataManager().hasGlobalSpawn()) return;
 
-        if (event.isNewPlayer()) {
+        // New players spawn at the global spawn. Returning players whom vanilla
+        // dumped at the world spawnpoint (invalid/lost logout position) are
+        // redirected too, so nobody lands at the camped world spawn.
+        if (event.isNewPlayer() || isAtWorldSpawn(event.getSpawnLocation())) {
             event.setSpawnLocation(plugin.getSpawnDataManager().getGlobalSpawn());
         }
+    }
+
+    private static boolean isAtWorldSpawn(Location loc) {
+        Location worldSpawn = loc.getWorld().getSpawnLocation();
+        return worldSpawn.getBlockX() == loc.getBlockX()
+                && worldSpawn.getBlockY() == loc.getBlockY()
+                && worldSpawn.getBlockZ() == loc.getBlockZ();
     }
 
     /**

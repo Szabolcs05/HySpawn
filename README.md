@@ -2,9 +2,12 @@
 
 A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Canvas servers.
 
+[![Modrinth](https://img.shields.io/modrinth/dt/hyspawn?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/plugin/hyspawn)
+[![Build](https://github.com/Szabolcs05/HySpawn/actions/workflows/build.yml/badge.svg)](https://github.com/Szabolcs05/HySpawn/actions/workflows/build.yml)
+
 ## Features
 
-- **Global Spawn** — Set a default spawn for first-join players and death respawns
+- **Global Spawn** — Set a default spawn for first-join players and death respawns; beds and respawn anchors still take priority (configurable via `spawn.respect-bed-spawn`)
 - **Void Spawn** — Per-world void fall rescue teleportation
 - **Spawn Command** — `/spawn` with configurable countdown, actionbar display, and movement cancellation
 - **Command Cooldown** — Configurable cooldown between `/spawn` uses
@@ -12,6 +15,7 @@ A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Ca
 - **MiniMessage** — Full MiniMessage formatting support for all messages
 - **PacketEvents** — Uses PacketEvents for actionbar messages
 - **Folia Support** — Fully compatible with Folia/Canvas via [UniversalScheduler](https://github.com/Anon8281/UniversalScheduler)
+- **bStats Metrics** — Anonymous usage statistics, [publicly viewable](https://bstats.org/plugin/bukkit/HySpawn/30946) and opt-out friendly
 
 ## Commands
 
@@ -38,6 +42,17 @@ A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Ca
 - [Paper](https://papermc.io/) 1.21.11+ (or Folia/Canvas)
 - [PacketEvents](https://github.com/retrooper/packetevents) 2.12.1+
 
+## Metrics
+
+HySpawn uses [bStats](https://bstats.org/plugin/bukkit/HySpawn/30946) to collect anonymous
+server statistics (server count, player count, Java and Minecraft versions). No personal or
+identifying data is collected, and the stats are public.
+
+To opt out, set `enabled: false` in `plugins/bStats/config.yml` — this disables metrics for
+every bStats plugin on the server.
+
+[![bStats](https://bstats.org/signatures/bukkit/HySpawn.svg)](https://bstats.org/plugin/bukkit/HySpawn/30946)
+
 ## Building
 
 ```bash
@@ -45,6 +60,22 @@ A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Ca
 ```
 
 Output jar will be in `build/libs/` with auto-incrementing build numbers (e.g. `HySpawn-b1.jar`).
+Release builds pin the version instead:
+
+```bash
+./gradlew shadowJar -PpluginVersion=1.1.0
+```
+
+## Releasing
+
+Pushing a `v*` tag builds the plugin, publishes a GitHub release, and uploads it to Modrinth:
+
+```bash
+git tag v1.1.0 && git push origin v1.1.0
+```
+
+Publishing to Modrinth requires a `MODRINTH_TOKEN` repository secret. The release workflow can
+also be run manually from the Actions tab.
 
 ## Author
 
