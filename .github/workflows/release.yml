@@ -97,6 +97,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check Modrinth token
+        if: env.MODRINTH_TOKEN != ''
+        run: |
+          CODE=$(curl -sS -o /tmp/modrinth-user.json -w '%{http_code}' \
+            -H "Authorization: $MODRINTH_TOKEN" \
+            https://api.modrinth.com/v2/user)
+          if [ "$CODE" = "200" ]; then
+            echo "Token accepted by Modrinth as user: $(jq -r '.username' /tmp/modrinth-user.json)"
+          else
+            echo "::error::Modrinth rejected the MODRINTH_TOKEN secret (HTTP $CODE)."
+            echo "Create a new token at https://modrinth.com/settings/pats with the"
+            echo "'Create versions' scope, then update the MODRINTH_TOKEN secret."
+            exit 1
+          fi
+
       - name: Publish to Modrinth
         if: env.MODRINTH_TOKEN != ''
         uses: Kir-Antipov/mc-publish@v3.3.1
@@ -112,6 +127,9 @@ jobs:
           dependencies: |
             packetevents(required)
           changelog-file: RELEASE_NOTES.md
+          # Unfeaturing older versions needs edit scopes this release does not
+          # otherwise require, and no HySpawn version is featured anyway.
+          modrinth-unfeature-mode: none
 
       - name: Note missing Modrinth token
         if: env.MODRINTH_TOKEN == ''
