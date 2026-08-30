@@ -10,6 +10,9 @@ gradle.properties
 .vscode/
 .kiro/
 
+# Generated during releases
+RELEASE_NOTES.md
+
 # OS
 .DS_Store
 Thumbs.db

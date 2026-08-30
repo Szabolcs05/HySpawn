@@ -5,6 +5,8 @@ A lightweight, Folia-compatible spawn management plugin for Paper, Folia, and Ca
 [![Modrinth](https://img.shields.io/modrinth/dt/hyspawn?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/plugin/hyspawn)
 [![Build](https://github.com/Szabolcs05/HySpawn/actions/workflows/build.yml/badge.svg)](https://github.com/Szabolcs05/HySpawn/actions/workflows/build.yml)
 
+See [CHANGELOG.md](CHANGELOG.md) for what changed in each release.
+
 ## Features
 
 - **Global Spawn** — Set a default spawn for first-join players and death respawns; beds and respawn anchors still take priority (configurable via `spawn.respect-bed-spawn`)

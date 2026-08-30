@@ -70,12 +70,29 @@ jobs:
       - name: Verify jar exists
         run: ls -lh "${{ steps.version.outputs.jar }}"
 
+      - name: Extract release notes from CHANGELOG
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Plain string matching, not regex — version numbers contain dots.
+          awk -v hdr="## [$VERSION]" '
+            index($0, hdr) == 1 { inside = 1; next }
+            inside && index($0, "## [") == 1 { exit }
+            inside { print }
+          ' CHANGELOG.md | sed -e '/./,$!d' > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "::warning::No CHANGELOG.md section found for $VERSION."
+            echo "See https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md" > RELEASE_NOTES.md
+          fi
+          echo "--- release notes ---"
+          cat RELEASE_NOTES.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: HySpawn ${{ steps.version.outputs.version }}
           files: ${{ steps.version.outputs.jar }}
+          body_path: RELEASE_NOTES.md
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -94,8 +111,7 @@ jobs:
           game-versions: ${{ env.GAME_VERSIONS }}
           dependencies: |
             packetevents(required)
-          changelog: |
-            Release notes: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}
+          changelog-file: RELEASE_NOTES.md
 
       - name: Note missing Modrinth token
         if: env.MODRINTH_TOKEN == ''
