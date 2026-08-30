@@ -9,6 +9,10 @@ spawn:
   cancel-on-move: true
   # Cooldown in seconds between /spawn uses (0 = no cooldown)
   cooldown: 30
+  # If true, players with a valid bed or respawn anchor respawn there.
+  # Players without one respawn at the global spawn instead of the world spawn.
+  # If false, everyone always respawns at the global spawn.
+  respect-bed-spawn: true
 
 sounds:
   # Set to "" to disable a sound

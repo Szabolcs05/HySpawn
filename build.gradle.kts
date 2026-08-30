@@ -4,9 +4,12 @@ plugins {
 }
 
 group = "dev.hyspawn"
-version = "1.0.1"
 
-// --- Auto-incrementing build number ---
+// Release builds pass -PpluginVersion=<version> (CI derives it from the git tag).
+val explicitVersion = findProperty("pluginVersion") as String?
+version = explicitVersion ?: "1.1.0"
+
+// --- Auto-incrementing build number (local dev builds only) ---
 val buildNumberFile = file("build-number.txt")
 val buildNumber: Int = if (buildNumberFile.exists()) {
     buildNumberFile.readText().trim().toIntOrNull() ?: 0
@@ -36,9 +39,25 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
+// Keep the un-shaded jar out of the way so it can never be mistaken for the
+// real artifact — only the shadow jar bundles the relocated dependencies.
+tasks.jar {
+    archiveClassifier.set("plain")
+}
+
+tasks.processResources {
+    val props = mapOf("version" to project.version)
+    inputs.properties(props)
+    filesMatching("paper-plugin.yml") {
+        expand(props)
+    }
+}
+
 tasks.shadowJar {
     archiveClassifier.set("")
-    archiveFileName.set("HySpawn-b${nextBuild}.jar")
+    archiveFileName.set(
+        if (explicitVersion != null) "HySpawn-${project.version}.jar" else "HySpawn-b${nextBuild}.jar"
+    )
     relocate("com.github.Anon8281.universalScheduler", "dev.hyspawn.universalScheduler")
     relocate("org.bstats", "dev.hyspawn.bstats")
 }

@@ -35,6 +35,10 @@ public final class ConfigManager {
         return config.getInt("spawn.cooldown", 30);
     }
 
+    public boolean isRespectBedSpawn() {
+        return config.getBoolean("spawn.respect-bed-spawn", true);
+    }
+
     public String getMessage(String key) {
         String prefix = config.getString("messages.prefix", "");
         String message = config.getString("messages." + key, "<red>Missing message: " + key);

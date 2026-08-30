@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class SpawnDataManager {
 
@@ -18,8 +20,27 @@ public final class SpawnDataManager {
     private final File dataFile;
     private FileConfiguration data;
 
-    private Location globalSpawn;
-    private final Map<String, Location> voidSpawns = new HashMap<>();
+    private StoredLocation globalSpawn;
+    private final Map<String, StoredLocation> voidSpawns = new HashMap<>();
+    private final Set<String> warnedWorlds = ConcurrentHashMap.newKeySet();
+
+    /**
+     * A location whose world is resolved lazily on each use, so spawns in
+     * worlds that load after this plugin enables still work.
+     */
+    private record StoredLocation(String worldName, double x, double y, double z, float yaw, float pitch) {
+
+        static StoredLocation of(Location loc) {
+            return new StoredLocation(loc.getWorld().getName(),
+                    loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        }
+
+        Location resolve() {
+            World world = Bukkit.getWorld(worldName);
+            if (world == null) return null;
+            return new Location(world, x, y, z, yaw, pitch);
+        }
+    }
 
     public SpawnDataManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -37,6 +58,7 @@ public final class SpawnDataManager {
             }
         }
         data = YamlConfiguration.loadConfiguration(dataFile);
+        warnedWorlds.clear();
         loadSpawns();
     }
 
@@ -46,7 +68,7 @@ public final class SpawnDataManager {
         voidSpawns.clear();
         if (data.isConfigurationSection("void-spawns")) {
             for (String worldName : data.getConfigurationSection("void-spawns").getKeys(false)) {
-                Location loc = deserializeLocation("void-spawns." + worldName);
+                StoredLocation loc = deserializeLocation("void-spawns." + worldName);
                 if (loc != null) {
                     voidSpawns.put(worldName, loc);
                 }
@@ -63,7 +85,7 @@ public final class SpawnDataManager {
     }
 
     public void setGlobalSpawn(Location location) {
-        this.globalSpawn = location.clone();
+        this.globalSpawn = StoredLocation.of(location);
         serializeLocation("spawn", location);
         save();
     }
@@ -75,15 +97,15 @@ public final class SpawnDataManager {
     }
 
     public Location getGlobalSpawn() {
-        return globalSpawn != null ? globalSpawn.clone() : null;
+        return resolve(globalSpawn);
     }
 
     public boolean hasGlobalSpawn() {
-        return globalSpawn != null;
+        return getGlobalSpawn() != null;
     }
 
     public void setVoidSpawn(String worldName, Location location) {
-        voidSpawns.put(worldName, location.clone());
+        voidSpawns.put(worldName, StoredLocation.of(location));
         serializeLocation("void-spawns." + worldName, location);
         save();
     }
@@ -95,12 +117,21 @@ public final class SpawnDataManager {
     }
 
     public Location getVoidSpawn(String worldName) {
-        Location loc = voidSpawns.get(worldName);
-        return loc != null ? loc.clone() : null;
+        return resolve(voidSpawns.get(worldName));
     }
 
     public boolean hasVoidSpawn(String worldName) {
-        return voidSpawns.containsKey(worldName);
+        return getVoidSpawn(worldName) != null;
+    }
+
+    private Location resolve(StoredLocation stored) {
+        if (stored == null) return null;
+        Location loc = stored.resolve();
+        if (loc == null && warnedWorlds.add(stored.worldName())) {
+            plugin.getLogger().warning("Spawn world '" + stored.worldName()
+                    + "' is not loaded — that spawn is unavailable until the world loads.");
+        }
+        return loc;
     }
 
     private void serializeLocation(String path, Location loc) {
@@ -112,13 +143,10 @@ public final class SpawnDataManager {
         data.set(path + ".pitch", (double) loc.getPitch());
     }
 
-    private Location deserializeLocation(String path) {
+    private StoredLocation deserializeLocation(String path) {
         if (!data.contains(path + ".world")) return null;
-        String worldName = data.getString(path + ".world");
-        World world = Bukkit.getWorld(worldName);
-        if (world == null) return null;
-        return new Location(
-                world,
+        return new StoredLocation(
+                data.getString(path + ".world"),
                 data.getDouble(path + ".x"),
                 data.getDouble(path + ".y"),
                 data.getDouble(path + ".z"),

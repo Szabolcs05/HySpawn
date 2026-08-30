@@ -17,6 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 @SuppressWarnings("UnstableApiUsage")
 public final class HySpawn extends JavaPlugin {
 
+    private static final int BSTATS_PLUGIN_ID = 30946;
+
     private ConfigManager configManager;
     private SpawnDataManager spawnDataManager;
     private TeleportManager teleportManager;
@@ -38,8 +40,7 @@ public final class HySpawn extends JavaPlugin {
     }
 
     private void initMetrics() {
-        // Replace 00000 with your bStats plugin ID from https://bstats.org
-        new Metrics(this, 30946);
+        new Metrics(this, BSTATS_PLUGIN_ID);
     }
 
     @Override
