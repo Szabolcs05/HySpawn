@@ -1,0 +1,18 @@
+HySpawn
+Copyright (c) 2026 Szabolcs (Szabolcs05) and contributors
+
+HySpawn is distributed under GNU GPL version 3 only (GPL-3.0-only).
+See LICENSE for the complete license text.
+Source code: https://github.com/Szabolcs05/HySpawn
+
+Bundled libraries (relocated in the plugin JAR):
+
+- bStats 3.2.1, Copyright (c) 2021 Bastian Oppermann, MIT License.
+  https://github.com/Bastian/bstats-metrics
+  License: licenses/MIT-bStats.txt
+
+- UniversalScheduler 0.1.7, Copyright (c) 2023 Sevastjan, MIT License.
+  https://github.com/Anon8281/UniversalScheduler
+  License: licenses/MIT-UniversalScheduler.txt
+
+These third-party notices and license terms are retained alongside HySpawn's GPL.

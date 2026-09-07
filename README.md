@@ -79,6 +79,15 @@ git tag v1.1.0 && git push origin v1.1.0
 Publishing to Modrinth requires a `MODRINTH_TOKEN` repository secret. The release workflow can
 also be run manually from the Actions tab.
 
+## License
+
+HySpawn is licensed under the **GNU General Public License version 3 only
+(GPL-3.0-only)**. See [LICENSE](LICENSE) for the full license text.
+
+The bundled bStats and UniversalScheduler libraries retain their MIT licenses.
+Their attribution and license texts are included in [NOTICE](NOTICE),
+the [licenses](licenses) directory, and the built plugin JAR.
+
 ## Author
 
 - **Szabolcs**

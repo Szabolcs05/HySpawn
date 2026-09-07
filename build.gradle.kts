@@ -39,6 +39,16 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
+// Include the project license and bundled dependency notices in both JARs.
+tasks.withType<Jar>().configureEach {
+    from(listOf("LICENSE", "NOTICE")) {
+        into("META-INF")
+    }
+    from("licenses") {
+        into("META-INF/licenses")
+    }
+}
+
 // Keep the un-shaded jar out of the way so it can never be mistaken for the
 // real artifact — only the shadow jar bundles the relocated dependencies.
 tasks.jar {
